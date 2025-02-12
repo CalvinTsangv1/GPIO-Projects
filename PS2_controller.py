@@ -5,6 +5,26 @@
 # description: Test PS2 Controller, and understand the workflow
 # PS2 Controller Testing through GPIOZero library (MCP3008) module to control directly
 
+'''
+Hardware Component:
+1. Raspberry Pi (Main Controller)
+2. MCP3008 (Analog-to-Digital Converter)
+3. Potentiometers (Variable Resistors)
+
+Wiring Diagram:
+MCP3008 Pin		Raspberry Pi Pin
+VDD(16)			3.3V
+VREF(15)		3.3V
+AGND(14)		GND
+CLK(13)			GPIO11 (SPI CLK)
+DOUT(12)		GPIO9 (SPI MISO)
+DIN(11)			GPIO10 (SPI MOSI)
+CS(10)			GPIO8 (SPI CEO)
+DGND(9)			GND
+CHO(1)			Potentiometer X
+CH1(2)			Potentiometer Y
+CH2(3)			Potentiometer Z
+'''
 
 from gpiozero import Button, MCP3008
 from gpiozero.tools import absoluted, scaled
