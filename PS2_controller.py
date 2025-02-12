@@ -1,3 +1,11 @@
+# PS2 Controller Testing
+
+# version: 1.0
+# author: Calvin Tsang
+# description: Test PS2 Controller, and understand the workflow
+# PS2 Controller Testing through GPIOZero library (MCP3008) module to control directly
+
+
 from gpiozero import Button, MCP3008
 from gpiozero.tools import absoluted, scaled
 from signal import pause
@@ -8,4 +16,51 @@ pot_y = MCP3008(channel=1)
 pot_z = MCP3008(channel=2)
 
 def MAP(x, in_min, in_max, out_min, out_max):
-	return (
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+	
+def makerobo_direction():
+	state = ['home', 'up', 'down', 'left', 'right', 'pressed']
+	i = 0
+	x_value = round(pot_x.value * 1024)
+	y_value = round(pot_y.value * 1024)
+	z_value = round(pot_z.value * 1024)
+	
+	x_value = round(MAP(x_value, 0, 1023, 0, 255))
+	y_value = round(MAP(y_value, 0, 1023, 0, 255))
+	z_value = round(MAP(z_value, 0, 1023, 0, 255))
+	
+	print('x_value: {}, y_value: {}, z_value{}'.format(x_value, y_value, z_value))
+	
+	if x_value <= 30:
+		i = 1  #up direction
+	if x_value >= 255:
+		i = 2  #down direction
+	if y_value >= 225:
+		i = 4  #left direction
+	if y_value <= 30:
+		i = 3 #right direction
+	if z_value <= 2 and y_value >= 128:
+		i = 5 #Button Click
+	if x_value - 125 < 15 and x_value - 125 > -15 and y_value - 125 < 15 and y_value - 125 > -15 and z_value >= 250:
+		i = 0
+	return state[i]
+	
+def makerobo_loop():
+	makerobo_status = ''
+	while True:
+		makerobo_tmp = makerobo_direction()
+		sleep(0.5)
+		if makerobo_tmp != None and makerobo_tmp != makerobo_status:
+			print(makerobo_tmp)
+			makerobo_status = makerobo_tmp
+			
+def destroy():
+	pass
+	
+if __name__ == "__main__":
+	try:
+		makerobo_loop()
+	except KeyboardInterrupt:
+		destroy()
+		
+		
